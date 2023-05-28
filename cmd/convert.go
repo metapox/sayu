@@ -5,9 +5,10 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/metapox/sayu/converter/converters"
-
 	"github.com/metapox/sayu/converter"
+	"github.com/metapox/sayu/converter/converters"
+	"github.com/metapox/sayu/input"
+
 	"github.com/spf13/cobra"
 )
 
@@ -22,11 +23,11 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("convert called")
-
-		pipeline := converter.NewPipeline()
+		inp := input.NewSolrLog("test/test.log")
+		pipeline := converter.NewPipeline(inp)
 		converter := converters.NewLogConverter()
 		pipeline.AddConverter(converter)
+		fmt.Println(pipeline.ShowConvertersInfo())
 		pipeline.Start()
 	},
 }

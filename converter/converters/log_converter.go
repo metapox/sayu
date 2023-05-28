@@ -1,9 +1,13 @@
 package converters
 
-import "fmt"
+import (
+	_interface "github.com/metapox/sayu/interface"
+)
 
 type LogConverter struct {
-	name string
+	name      string
+	loadQueue [][]byte
+	data      []byte
 }
 
 func NewLogConverter() *LogConverter {
@@ -16,7 +20,9 @@ func (converter LogConverter) Name() string {
 	return converter.name
 }
 
-func (converter LogConverter) Convert(data string) string {
-	fmt.Println("LogConverter: " + data)
-	return data
+func (converter LogConverter) Convert(input _interface.Input) []byte {
+	return []byte("test" + string(input.Hash()))
+}
+
+func (converter LogConverter) Load() {
 }
