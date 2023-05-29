@@ -1,13 +1,15 @@
 package converters
 
 import (
-	_interface "github.com/metapox/sayu/interface"
+	queue "github.com/metapox/sayu/internal/pkg"
+	"regexp"
 )
 
 type LogConverter struct {
 	name      string
-	loadQueue [][]byte
-	data      []byte
+	loadQueue queue.Queue
+	loadData  []byte
+	dataQueue queue.Queue
 }
 
 func NewLogConverter() *LogConverter {
@@ -20,9 +22,16 @@ func (converter LogConverter) Name() string {
 	return converter.name
 }
 
-func (converter LogConverter) Convert(input _interface.Input) []byte {
-	return []byte("test" + string(input.Hash()))
-}
+func (converter LogConverter) Convert(data []byte, ndata []byte) ([]byte, []byte) {
+	nd := converter.loadQueue.Dequeue().([]byte)
+	pattern := `\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}`
+	matched := regexp.MustCompile(pattern).Match(converter.loadData)
+	nmatched := regexp.MustCompile(pattern).Match(nd)
 
-func (converter LogConverter) Load() {
+	if matched && nmatched {
+		return data, ndata
+	} else {
+		data = append(data, nd...)
+		return nil, data
+	}
 }
