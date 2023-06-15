@@ -9,6 +9,7 @@ import (
 type pipeline struct {
 	input      _interface.Input
 	converters []_interface.Converter
+	workers    []Worker
 }
 
 func (pipeline *pipeline) Start() (err error) {
@@ -22,9 +23,10 @@ func (pipeline *pipeline) Start() (err error) {
 	out, err := os.OpenFile("test/new_test.log", os.O_WRONLY|os.O_CREATE, 0666)
 	defer out.Close()
 
-	for fr.Scan() {
-		for _, converter := range pipeline.converters {
-			out.Write(converter.Convert(fr.Bytes()))
+	for _, worker := range pipeline.workers {
+		for fr.Scan() {
+			worker.Push(fr.Bytes())
+			out.Write(worker.converter.Convert(fr.Bytes()))
 			out.Write([]byte("\n"))
 		}
 	}
@@ -40,8 +42,8 @@ func (pipeline *pipeline) ShowConvertersInfo() string {
 	return info
 }
 
-func (pipeline *pipeline) AddConverter(converter _interface.Converter) {
-	pipeline.converters = append(pipeline.converters, converter)
+func (pipeline *pipeline) RegistConverter(converter _interface.Converter) {
+	pipeline.workers = append(pipeline.workers, NewWorker(converter))
 }
 
 func NewPipeline(input _interface.Input) *pipeline {
