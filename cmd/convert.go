@@ -26,7 +26,7 @@ to quickly create a Cobra application.`,
 		inp := input.NewSolrLog("test/test.log")
 		pipeline := converter.NewPipeline(inp)
 		converter := converters.NewLogConverter()
-		pipeline.AddConverter(converter)
+		pipeline.RegistConverter(converter)
 		fmt.Println(pipeline.ShowConvertersInfo())
 		pipeline.Start()
 	},
