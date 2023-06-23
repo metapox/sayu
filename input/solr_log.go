@@ -1,6 +1,7 @@
 package input
 
 import (
+	"bufio"
 	"crypto/sha256"
 	"io"
 	"log"
@@ -29,6 +30,19 @@ func NewSolrLog(filepath string) *SolrLog {
 	return &SolrLog{
 		filepath: filepath,
 		hash:     hashValue,
+	}
+}
+
+func (solrLog *SolrLog) Read(queue chan<- []byte) {
+	file, err := os.Open(solrLog.filepath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	fr := bufio.NewScanner(file)
+	for fr.Scan() {
+		queue <- fr.Bytes()
 	}
 }
 

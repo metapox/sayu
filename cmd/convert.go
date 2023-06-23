@@ -8,6 +8,7 @@ import (
 	"github.com/metapox/sayu/converter"
 	"github.com/metapox/sayu/converter/converters"
 	"github.com/metapox/sayu/input"
+	"github.com/metapox/sayu/output"
 
 	"github.com/spf13/cobra"
 )
@@ -24,7 +25,8 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		inp := input.NewSolrLog("test/test.log")
-		pipeline := converter.NewPipeline(inp)
+		outp := output.NewLocalFile("test/new_test.log")
+		pipeline := converter.NewPipeline(inp, outp)
 		converter := converters.NewLogConverter()
 		pipeline.RegistConverter(converter)
 		fmt.Println(pipeline.ShowConvertersInfo())
