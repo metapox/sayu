@@ -1,9 +1,7 @@
 package converter
 
 import (
-	"context"
 	_interface "github.com/metapox/sayu/interface"
-	"log"
 	"sync"
 )
 
@@ -27,47 +25,44 @@ func NewWorker(maxConcurrentExecution int, converter _interface.Converter, queue
 	}
 }
 
-func (worker Worker) Start(ctx context.Context) {
+func (worker Worker) Start() {
 	worker.wg.Add(1)
-	go worker.loop(ctx)
+	go worker.loop()
 }
 
 func (worker Worker) Push(data []byte) {
 	worker.queue <- data
 }
 
+func (worker Worker) Close() {
+	close(worker.queue)
+}
+
 func (worker Worker) Stop() {
 	worker.wg.Done()
+	close(worker.nextQueue)
 }
 
 func (worker Worker) Wait() {
 	worker.wg.Wait()
 }
 
-func (worker Worker) loop(ctx context.Context) {
+func (worker Worker) loop() {
 	var wg sync.WaitGroup
-Loop:
-	for {
-		select {
-		case <-ctx.Done():
-			log.Println(worker.converter.Name(), "start")
-			wg.Wait()
-			break Loop
-		case data := <-worker.queue:
-			wg.Add(1)
-			worker.sem <- struct{}{}
-			go func() {
-				defer func() {
-					<-worker.sem
-					wg.Done()
-				}()
-				var ndata []byte
-				ndata, worker.data = worker.converter.Convert(worker.data, data)
-				if ndata != nil {
-					worker.nextQueue <- ndata
-				}
+	for data := range worker.queue {
+		wg.Add(1)
+		worker.sem <- struct{}{}
+		go func() {
+			defer func() {
+				<-worker.sem
+				wg.Done()
 			}()
-		}
+			var ndata []byte
+			ndata, worker.data = worker.converter.Convert(worker.data, data)
+			if ndata != nil {
+				worker.nextQueue <- ndata
+			}
+		}()
 	}
 	worker.Stop()
 }
