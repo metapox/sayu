@@ -5,12 +5,13 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/metapox/sayu/config"
 	"github.com/metapox/sayu/converter"
-	"github.com/metapox/sayu/converter/converters"
 	"github.com/metapox/sayu/input"
 	"github.com/metapox/sayu/output"
-
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
+	"os"
 )
 
 // convertCmd represents the convert command
@@ -24,11 +25,34 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		inp := input.NewSolrLog("test/test.log")
-		outp := output.NewLocalFile("test/new_test.log")
+		c := config.Config{}
+		data, err := os.ReadFile("config.yaml")
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		yaml.Unmarshal(data, &c)
+		
+		inp, err := input.CreateInput(c.Input)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		outp, err := output.CreateOutput(c.Output)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 		pipeline := converter.NewPipeline(inp, outp)
-		converter := converters.NewLogConverter()
-		pipeline.RegistConverter(converter)
+		for _, cc := range c.Converters {
+			conv, err := converter.CreateConverter(cc)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			pipeline.RegistConverter(conv)
+		}
 		fmt.Println(pipeline.ShowConvertersInfo())
 		pipeline.Start()
 	},

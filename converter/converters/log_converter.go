@@ -9,10 +9,10 @@ type LogConverter struct {
 	name string
 }
 
-func NewLogConverter() *LogConverter {
+func NewLogConverter() (*LogConverter, error) {
 	return &LogConverter{
 		name: "log-converter",
-	}
+	}, nil
 }
 
 func (converter LogConverter) Name() string {

@@ -1,0 +1,12 @@
+input:
+  name: localfile
+  options:
+    filepath: test/test.log
+converters:
+  - name: logConverter
+    options:
+      maxConcurrent: 10
+output:
+  name: localfile
+  options:
+    filepath: test/new_test.log
