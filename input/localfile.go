@@ -1,6 +1,7 @@
-package output
+package input
 
 import (
+	"bufio"
 	"crypto/sha256"
 	"io"
 	"log"
@@ -8,8 +9,8 @@ import (
 )
 
 type Localfile struct {
-	options LocalfileOptions
 	hash    []byte
+	options LocalfileOptions
 }
 
 type LocalfileOptions struct {
@@ -33,19 +34,19 @@ func NewLocalfile(options LocalfileOptions) (*Localfile, error) {
 	return &Localfile{
 		options: options,
 		hash:    hashValue,
-	}, nil
+	}, err
 }
 
-func (localfile *Localfile) Write(queue <-chan []byte) {
-	out, err := os.OpenFile(localfile.options.Filepath, os.O_WRONLY|os.O_CREATE, 0666)
-	defer out.Close()
+func (localfile *Localfile) Read(queue chan<- []byte) {
+	file, err := os.Open(localfile.options.Filepath)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer out.Close()
-	for data := range queue {
-		out.Write(data)
-		out.Write([]byte("\n"))
+	defer file.Close()
+
+	fr := bufio.NewScanner(file)
+	for fr.Scan() {
+		queue <- fr.Bytes()
 	}
 }
 
