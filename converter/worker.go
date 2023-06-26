@@ -14,9 +14,9 @@ type Worker struct {
 	wg        sync.WaitGroup
 }
 
-func NewWorker(maxConcurrentExecution int, converter _interface.Converter, queue chan []byte, nextQueue chan []byte) Worker {
+func NewWorker(converter _interface.Converter, queue chan []byte, nextQueue chan []byte) Worker {
 	return Worker{
-		sem:       make(chan struct{}, maxConcurrentExecution),
+		sem:       make(chan struct{}, converter.MaxConcurrent()),
 		queue:     queue,
 		nextQueue: nextQueue,
 		data:      []byte{},

@@ -35,8 +35,8 @@ func (pipeline *pipeline) ShowConvertersInfo() string {
 }
 
 func (pipeline *pipeline) RegistConverter(converter _interface.Converter) {
-	nextQueue := make(chan []byte, 1)
-	pipeline.workers = append(pipeline.workers, NewWorker(100, converter, pipeline.queue, nextQueue))
+	nextQueue := make(chan []byte, 100)
+	pipeline.workers = append(pipeline.workers, NewWorker(converter, pipeline.queue, nextQueue))
 	pipeline.queue = nextQueue
 	pipeline.wg.Add(1)
 }
@@ -57,6 +57,6 @@ func NewPipeline(input _interface.Input, output _interface.Output) *pipeline {
 		output:     output,
 		converters: []_interface.Converter{},
 		workers:    []Worker{},
-		queue:      make(chan []byte, 1),
+		queue:      make(chan []byte, 100),
 	}
 }
