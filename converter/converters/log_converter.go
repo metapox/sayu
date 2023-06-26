@@ -6,17 +6,27 @@ import (
 )
 
 type LogConverter struct {
-	name string
+	name    string
+	options LogConverterOptions
 }
 
-func NewLogConverter() (*LogConverter, error) {
+type LogConverterOptions struct {
+	MaxConcurrent int `yaml:"maxConcurrent"`
+}
+
+func NewLogConverter(options LogConverterOptions) (*LogConverter, error) {
 	return &LogConverter{
-		name: "log-converter",
+		name:    "log-converter",
+		options: options,
 	}, nil
 }
 
 func (converter LogConverter) Name() string {
 	return converter.name
+}
+
+func (converter LogConverter) MaxConcurrent() int {
+	return converter.options.MaxConcurrent
 }
 
 func (converter LogConverter) Convert(data []byte, ndata []byte) ([]byte, []byte) {
