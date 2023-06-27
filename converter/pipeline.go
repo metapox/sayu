@@ -15,7 +15,7 @@ type pipeline struct {
 }
 
 func (pipeline *pipeline) Start() (err error) {
-	pipeline.StartupWorkers()
+	pipeline.startupWorkers()
 
 	pipeline.input.Read(pipeline.workers[0].queue)
 	pipeline.workers[0].Close()
@@ -41,7 +41,7 @@ func (pipeline *pipeline) RegistConverter(converter _interface.Converter) {
 	pipeline.wg.Add(1)
 }
 
-func (pipeline *pipeline) StartupWorkers() {
+func (pipeline *pipeline) startupWorkers() {
 	for _, worker := range pipeline.workers {
 		go func() {
 			go worker.Start()
