@@ -26,14 +26,6 @@ func (pipeline *pipeline) Start() (err error) {
 	return nil
 }
 
-func (pipeline *pipeline) ShowConvertersInfo() string {
-	info := "以下のconverterが登録されています\n"
-	for _, worker := range pipeline.workers {
-		info += worker.converter.Name() + "\n"
-	}
-	return info
-}
-
 func (pipeline *pipeline) RegistConverter(converter _interface.Converter) {
 	nextQueue := make(chan []byte, 1)
 	pipeline.workers = append(pipeline.workers, NewWorker(100, converter, pipeline.queue, nextQueue))
