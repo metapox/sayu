@@ -15,7 +15,7 @@ type pipeline struct {
 }
 
 func (pipeline *pipeline) Start() (err error) {
-	pipeline.StartupWorkers()
+	pipeline.startupWorkers()
 
 	pipeline.input.Read(pipeline.workers[0].queue)
 	pipeline.workers[0].Close()
@@ -26,14 +26,6 @@ func (pipeline *pipeline) Start() (err error) {
 	return nil
 }
 
-func (pipeline *pipeline) ShowConvertersInfo() string {
-	info := "以下のconverterが登録されています\n"
-	for _, worker := range pipeline.workers {
-		info += worker.converter.Name() + "\n"
-	}
-	return info
-}
-
 func (pipeline *pipeline) RegistConverter(converter _interface.Converter) {
 	nextQueue := make(chan []byte, 100)
 	pipeline.workers = append(pipeline.workers, NewWorker(converter, pipeline.queue, nextQueue))
@@ -41,7 +33,7 @@ func (pipeline *pipeline) RegistConverter(converter _interface.Converter) {
 	pipeline.wg.Add(1)
 }
 
-func (pipeline *pipeline) StartupWorkers() {
+func (pipeline *pipeline) startupWorkers() {
 	for _, worker := range pipeline.workers {
 		go func() {
 			go worker.Start()

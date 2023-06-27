@@ -4,6 +4,7 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/metapox/sayu/config"
 	"github.com/metapox/sayu/converter"
@@ -31,8 +32,19 @@ to quickly create a Cobra application.`,
 			fmt.Println(err)
 			os.Exit(1)
 		}
+		// check execute from input
+		fmt.Println("以下の設定で実行します")
+		fmt.Println(string(data))
+		fmt.Println("実行しますか？[y/N]: ")
+		scanner := bufio.NewScanner(os.Stdin)
+		scanner.Scan()
+		text := scanner.Text()
+		if text != "y" {
+			fmt.Println("終了します")
+			os.Exit(0)
+		}
 		yaml.Unmarshal(data, &c)
-		
+
 		inp, err := input.CreateInput(c.Input)
 		if err != nil {
 			fmt.Println(err)
