@@ -66,6 +66,7 @@ to quickly create a Cobra application.`,
 			pipeline.RegistConverter(conv)
 		}
 		pipeline.Start()
+		fmt.Println("完了しました")
 	},
 }
 

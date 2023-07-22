@@ -5,7 +5,7 @@ input:
 converters:
   - name: logConverter
     options:
-      maxConcurrent: 100
+      maxConcurrent: 1
 output:
   name: localfile
   options:

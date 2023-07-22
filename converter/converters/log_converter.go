@@ -1,7 +1,6 @@
 package converters
 
 import (
-	"fmt"
 	"regexp"
 )
 
@@ -34,7 +33,6 @@ func (converter LogConverter) Convert(data []byte, ndata []byte) ([]byte, []byte
 	matched := regexp.MustCompile(`^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}) (\w+) \(([\w-]+)\) \[([\w:]+)\] (.*)$`).Match(data)
 
 	if matched {
-		fmt.Println(string(data))
 		return data, []byte{}
 	} else {
 		pattern := `\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}`
