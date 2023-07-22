@@ -52,7 +52,7 @@ func (worker Worker) loop() {
 	for data := range worker.queue {
 		wg.Add(1)
 		worker.sem <- struct{}{}
-		go func() {
+		go func(data []byte) {
 			defer func() {
 				<-worker.sem
 				wg.Done()
@@ -62,7 +62,8 @@ func (worker Worker) loop() {
 			if ndata != nil {
 				worker.nextQueue <- ndata
 			}
-		}()
+		}(data)
 	}
+	wg.Wait()
 	worker.Stop()
 }
